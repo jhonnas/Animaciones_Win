@@ -1,218 +1,230 @@
 #include <conio.h>
+#include <stdio.h>
 #include <iostream>
-#include <winbgim.h>
+#include <graphics.h>
 #include <dos.h>
-#include <time.h>
-#include <stdlib.h>
 
+#define Derecha 1000
+#define Izquierda 1000
 
-using namespace std;
+#define tiempo 1
 
-#define Negro 0
-#define Amarillo 14
-#define MAX_BOLITAS 10
+#define ColorPoste 5
+#define ColorPlato 10
 
-class CGrafico
+#define alto 8
+
+#define PXA 200
+#define PYA 350
+
+#define PXB PXA+150
+#define PYB PYA
+
+#define PXC PXA+300
+#define PYC PYA
+
+int n=6;
+
+int PA;
+int PB;
+int PC;
+
+int POSTEA[12];
+int POSTEB[12];
+int POSTEC[12];
+
+int PX[12];
+int PY[12];
+int ANCHO[12];
+
+void ModoGrafico()
 {
- private:
-  int VHBG;
-  int vhbg;
- public:
-  CGrafico()
-  {
-   initwindow(800,600);
-  }
-  ~CGrafico()
-  {
-   closegraph();
-  }
-};
+ int SISTEMAS=DETECT,sistemas;
+ initgraph(&SISTEMAS,&sistemas,"");
+   // settextstyle(int font, int direction,int font_size);
+  settextstyle(10,0,2);
+    setcolor(3);
+    outtextxy(220,50,".::Torre de Hanoi::.");
+    outtextxy(200,380,"Cantidad de platos: 08");
+//1
+    setcolor(5);
+	line(20,20,20,450);
+	line(20+2,20,20+2,450);
+	line(20-2,20,20-2,450);
+	//2
+	setcolor(5);
+	line(20,20,600,20);
+	line(20,20+2,600,20+2);
+	line(20,20-2,600,20-2);
+	//3
+	setcolor(5);
+	line(600,20,600,450);
+	line(600+2,20,600+2,450);
+	line(600-2,20,600-2,450);
+	//4
+	setcolor(5);
+	line(20,450,600,450);
+	line(20,450+2,600,450+2);
+	line(20,450-2,600,450-2);
 
-class CFiguras
+
+}
+
+void DibujarPostes()
 {
- private:
-  int PX[MAX_BOLITAS];
-  int PY[MAX_BOLITAS];
-  int RADIO[MAX_BOLITAS];
-  int LUGAR[MAX_BOLITAS];
- public:
-  CFiguras();
-  void Figura1(int,int,int);
-  void Figura2(int,int,int);
-  void Figura3(int,int,int);
-  void Figura4(int,int,int);
-  void Figura5(int,int,int);
-  void Figura6(int,int,int);
-  void Figura7(int,int,int);
-  void Figura8(int,int,int);
-  void Figura9(int,int,int);
-  void Animacion();
-  void RotarFigura(int,int,int,int);
-};
+ setfillstyle(1,ColorPoste);
+ bar(PXA-2,PYA,PXA+2,PYA-15*alto);
+ bar(PXB-2,PYB,PXB+2,PYB-15*alto);
+ bar(PXC-2,PYC,PXC+2,PYC-15*alto);
+ setcolor(5);
 
+ line(PXA-3,PYA,PXA-3,PYA-15*alto);
+ line(PXA+3,PYA,PXA+3,PYA-15*alto);
 
-CFiguras::CFiguras()
+ line(PXA-3,PYA,PXA+3,PYA);
+
+ line(PXB-3,PYB,PXB-3,PYB-15*alto);
+ line(PXB+3,PYB,PXB+3,PYB-15*alto);
+
+ line(PXB-3,PYB,PXB+3,PYB);
+
+ line(PXC-3,PYC,PXC-3,PYC-15*alto);
+ line(PXC+3,PYC,PXC+3,PYC-15*alto);
+
+ line(PXC-3,PYC,PXC+3,PYC);
+}
+
+void DibujarPlato(int x,int y,int ancho)
 {
- setfillstyle(6,9);
- bar(0,0,800,600);
- srand(time(NULL));
- for(int i=0;i<MAX_BOLITAS;i++)
+ setfillstyle(1,ColorPlato);
+ bar(x-ancho/2,y-alto/2,x+ancho/2,y+alto/2);
+ setcolor(3);
+ rectangle(x-ancho/2,y-alto/2,x+ancho/2,y+alto/2);
+}
+
+void BorrarPlato(int x,int y,int ancho)
+{
+ setfillstyle(1,0);
+ bar(x-ancho/2,y-alto/2,x+ancho/2,y+alto/2);
+
+ setcolor(0);
+ rectangle(x-ancho/2,y-alto/2,x+ancho/2,y+alto/2);
+ setfillstyle(1,ColorPoste);
+ bar(x-2,y-alto/2,x+2,y+alto/2);
+
+ setcolor(15);
+ line(x-3,y-alto/2,x-3,y+alto/2);
+ line(x+3,y-alto/2,x+3,y+alto/2);
+
+}
+
+void BorrarPlato_(int x,int y,int ancho)
+{
+ setfillstyle(1,0);
+ bar(x-ancho/2,y-alto/2,x+ancho/2,y+alto/2);
+ setcolor(0);
+ rectangle(x-ancho/2,y-alto/2,x+ancho/2,y+alto/2);
+}
+
+void DibujarTorres(int cant)
+{
+ for(int i=0;i<cant;i++)
  {
-  PX[i]=random(800);
-  PY[i]=random(600);
-  RADIO[i]=random(40)+10;
-  LUGAR[i]=random(10);
+  DibujarPlato(PXA,PYA-alto*i,15*(cant-i));
+  POSTEA[i]=cant-i;
+  POSTEB[i]=0;
+  POSTEC[i]=0;
  }
-};
-
-void CFiguras::Figura1(int x, int y,int radio)
-{
- setfillstyle(1,Negro);
- setcolor(Negro);
- sector(x,y,0,360,radio,radio);
- circle(x,y,radio);
- setfillstyle(1,Amarillo);
- setcolor(Amarillo);
- for(int i=0;i<0.8*radio;i++)
-  ellipse(x,y,270,90,radio-0.5*i,radio);
+ PA=cant;
+ PB=PC=0;
 }
 
-void CFiguras::Figura2(int x, int y,int radio)
+void MoverPlato(int posteinicio,int postefinal)
 {
- setfillstyle(1,Negro);
- setcolor(Negro);
- sector(x,y,0,360,radio,radio);
- circle(x,y,radio);
- setfillstyle(1,Amarillo);
- setcolor(Amarillo);
- for(int i=0;i<0.8*radio;i++)
-  ellipse(x,y,270,90,radio-0.5*i,radio);
-}
-
-void CFiguras::Figura3(int x, int y,int radio)
-{
- setfillstyle(1,Negro);
- setcolor(Negro);
- sector(x,y,0,360,radio,radio);
- circle(x,y,radio);
- setfillstyle(1,Amarillo);
- setcolor(Amarillo);
- for(int i=0;i<0.8*radio;i++)
-  ellipse(x,y,270,90,radio-i,radio);
-}
-
-void CFiguras::Figura4(int x, int y,int radio)
-{
- setfillstyle(1,Amarillo);
- setcolor(Amarillo);
- sector(x,y,0,360,radio,radio);
- circle(x,y,radio);
- setfillstyle(1,Amarillo);
- setcolor(Negro);
- for(int i=0;i<0.8*radio;i++)
-  ellipse(x,y,90,270,radio-0.5*i,radio);
-}
-
-void CFiguras::Figura5(int x, int y,int radio)
-{
- setfillstyle(1,Amarillo);
- setcolor(Amarillo);
- sector(x,y,0,360,radio,radio);
- circle(x,y,radio);
- setfillstyle(1,Amarillo);
- setcolor(Negro);
- circle(x,y,radio);
-}
-
-void CFiguras::Figura6(int x, int y,int radio)
-{
- setfillstyle(1,Amarillo);
- setcolor(Amarillo);
- sector(x,y,0,360,radio,radio);
- circle(x,y,radio);
- setfillstyle(1,Negro);
- setcolor(Negro);
- for(int i=0;i<0.8*radio;i++)
-  ellipse(x,y,270,90,radio-0.5*i,radio);
-}
-
-void CFiguras::Figura7(int x, int y,int radio)
-{
- setfillstyle(1,Amarillo);
- setcolor(Amarillo);
- sector(x,y,0,360,radio,radio);
- circle(x,y,radio);
- setfillstyle(1,Negro);
- setcolor(Negro);
- for(int i=0;i<0.8*radio;i++)
-  ellipse(x,y,270,90,radio-i,radio);
-}
-
-void CFiguras::Figura8(int x, int y,int radio)
-{
- setfillstyle(5,Negro);
- setcolor(Negro);
- sector(x,y,0,360,radio,radio);
- circle(x,y,radio);
- setfillstyle(1,Negro);
- setcolor(Amarillo);
- for(int i=0;i<0.8*radio;i++)
-  ellipse(x,y,90,270,radio-0.5*i,radio);
-}
-
-void CFiguras::Figura9(int x, int y,int radio)
-{
- setfillstyle(1,Negro);
- setcolor(Negro);
- sector(x,y,0,360,radio,radio);
- circle(x,y,radio);
- setfillstyle(1,Negro);
- setcolor(Amarillo);
- for(int i=0;i<0.8*radio;i++)
-  ellipse(x,y,90,200,radio-0.5*i,radio);
-}
-void CFiguras::RotarFigura(int x, int y,int pos,int radio)
-{
- switch(pos)
+ delay(300);
+ int valor;
+ if(posteinicio==1)
  {
-  case 1:Figura1(x,y,radio);break;
-  case 2:Figura1(x,y,radio);break;
-  case 3:Figura1(x,y,radio);break;
-  case 4:Figura1(x,y,radio);break;
-  case 5:Figura1(x,y,radio);break;
-  case 6:Figura1(x,y,radio);break;
-  case 7:Figura1(x,y,radio);break;
-  case 8:Figura1(x,y,radio);break;
-  case 9:Figura1(x,y,radio);break;
+  BorrarPlato(PXA,PYA-alto*(PA-1),150);
+  PA--;
+  valor=POSTEA[PA];
+  POSTEA[PA]=0;
  }
-}
-
-void CFiguras::Animacion()
-{
- int i;
- while(!kbhit())
+ if(posteinicio==2)
  {
-  for(i=0;i<MAX_BOLITAS;i++)
-   RotarFigura(PX[i],PY[i],LUGAR[i],RADIO[i]);
-
-  for(i=0;i<MAX_BOLITAS;i++)
-   LUGAR[i]++;
-
-  for(i=0;i<MAX_BOLITAS;i++)
-   if(LUGAR[i]==10)
-    LUGAR[i]=1;
+  BorrarPlato(PXB,PYB-alto*(PB-1),150);
+  PB--;
+  valor=POSTEB[PB];
+  POSTEB[PB]=0;
  }
+ if(posteinicio==3)
+ {
+  BorrarPlato(PXC,PYC-alto*(PC-1),150);
+  PC--;
+  valor=POSTEC[PC];
+  POSTEC[PC]=0;
+ }
+
+ if(postefinal==1)
+ {
+  DibujarPlato(PXA,PYA-alto*PA,15*valor);
+  PA++;
+  POSTEA[PA-1]=valor;
+ }
+ if(postefinal==2)
+ {
+  DibujarPlato(PXB,PYB-alto*PB,15*valor);
+  PB++;
+  POSTEB[PB-1]=valor;
+ }
+ if(postefinal==3)
+ {
+  DibujarPlato(PXC,PYC-alto*PC,15*valor);
+  PC++;
+  POSTEC[PC-1]=valor;
+ }
+
+ /*
+ for(int i=0;i<n;i++)
+ {
+  gotoxy(i+1,1);
+  cout<<POSTEA[i]<<"  ";
+  gotoxy(i+1,2);
+  cout<<POSTEB[i]<<"  ";
+  gotoxy(i+1,3);
+  cout<<POSTEC[i]<<"  ";
+ }
+ */
 }
- void mover(){
 
-
- }
-int main()
+void Hanoi(int n,int frompeg,int topeg,int auxpeg)
 {
- CGrafico G;
- CFiguras *F;
- F=new CFiguras;
- F->Animacion();
- getch();
- return 0;
+ if(n==1)
+ {
+  MoverPlato(frompeg,topeg);
+  return;
+ }
+ Hanoi(n-1,frompeg,auxpeg,topeg);
+ MoverPlato(frompeg,topeg);
+ Hanoi(n-1,auxpeg,topeg,frompeg);
+}
+
+void menu(){
+
+   // settextstyle(int font, int direction,int font_size);
+  settextstyle(10,0,2);
+    setcolor(3);
+    outtextxy(220,50,".::Tetris::.");
+
+}
+
+
+int main(){
+
+
+    n=8;
+    ModoGrafico();
+    DibujarPostes();
+    DibujarTorres(n);
+    Hanoi(n,1,3,2);
 }
